@@ -317,6 +317,31 @@ def create_keys():
     pass  # Delete this line and complete this method
 
 
+def generate_d(e, z):
+    """
+    Generates a d value to solve e*d (mod z) = 1
+    :param e: e value of key
+    :param z: z value of key
+    :return: the d to solve the problem
+    """
+
+    d = 0
+    r = z
+    newt = 1
+    newr = e
+    while newr != 0:
+        quotient = r // newr
+        (d, newt) = (newt, d - quotient * newt)
+        (r, newr) = (newr, r - quotient * newr)
+    if r > 1:
+        return -1
+    if d < 0:
+        d = d + z
+    return d
+
+
+
+
 def apply_key(key, m):
     """
     Apply the key, given as a tuple (e,n) or (d,n) to the message.
@@ -329,6 +354,8 @@ def apply_key(key, m):
              if given the public key and a message, encrypts the message
              and returns the ciphertext.
     """
+
+
 
     pass  # Delete this line and complete this method
 
