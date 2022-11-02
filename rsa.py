@@ -371,7 +371,41 @@ def break_key(pub):
     :param pub: a tuple containing the public key (e,n)
     :return: a tuple containing the private key (d,n)
     """
-    pass  # Delete this line and complete this method
+
+    e = pub[0]
+    factors_list = []
+    # Get all factors of n
+    factors_list =get_factors(pub[1])
+
+    # Get all prime factors of n
+    primes = []
+    for x in range(1, len(factors_list)):
+        if get_prime(factors_list[x]):
+            primes.append(factors_list[x])
+
+    p = primes[0]
+    q = primes[1]
+    z = (p - 1) * (q - 1)
+    d = generate_d(e, z)
+
+    return d, pub[1]
+
+
+def get_factors(number):
+    factor_list = []
+    for x in range(1, number+1):
+        if number % x == 0:
+            factor_list.append(x)
+
+    return factor_list
+
+
+def get_prime(number):
+    for x in range(2, number):
+        if number % x == 0:
+            return False
+
+    return True
 
 
 # Add additional functions here, if needed.
