@@ -9,7 +9,8 @@
 
 16-bit RSA
 
-Introduction: (Describe the lab in your own words)
+Introduction: (Describe the lab in your own words): In this lab we seek to create both public and private key values,
+encrypt and decrypt message using these key values, and to get the private key from a given public key.
 
 
 
@@ -45,6 +46,7 @@ Summary: (Summarize your experience with the lab, what you learned, what you lik
 
 import random
 import math
+import sys
 
 # Use these named constants as you write your code
 # To increase the key size add more 1's and 0's to these values
@@ -178,7 +180,7 @@ def encrypt_message_interactive():
     print("Encrypted message:", encrypted)
 
 
-def decrypt_message_interactive(private_key = None):
+def decrypt_message_interactive(private_key=None):
     """
     Decrypt a message
     """
@@ -297,6 +299,7 @@ def format_as_hex(value):
     """
     return "{:0{digits}x}".format(value, digits=str(get_hex_digits()))
 
+
 # ---------------------------------------
 # Do not modify code above this line
 # ---------------------------------------
@@ -310,11 +313,33 @@ def format_as_hex(value):
 def create_keys():
     """
     Create the public and private keys.
-
     :return: the keys as a three-tuple: (e,d,n)
     """
 
-    pass  # Delete this line and complete this method
+    e = 65537
+
+    p = random.randint(1, e)
+    q = random.randint(1, e)
+
+    if p != q:
+        while not get_prime(p):
+            p = random.randint(1, e)
+        while not get_prime(q):
+            q = random.randint(1, e)
+
+        n = p * q
+
+        z = (p - 1) * (q - 1)
+
+        d = generate_d(e, z)
+        print("d = ", d)
+
+    else:
+        while p == q:
+            p = random.randint(1, e)
+            q = random.randint(1, e)
+
+    return e, d, n
 
 
 def generate_d(e, z):
@@ -340,8 +365,6 @@ def generate_d(e, z):
     return d
 
 
-
-
 def apply_key(key, m):
     """
     Apply the key, given as a tuple (e,n) or (d,n) to the message.
@@ -355,9 +378,39 @@ def apply_key(key, m):
              and returns the ciphertext.
     """
 
+    if key[0] == PUBLIC_EXPONENT:
+        # public key
+        return public_key_encrypt(key, m)
+    else:
+        # private key
+        return private_key_decrypt(key, m)
 
 
-    pass  # Delete this line and complete this method
+def public_key_encrypt(key, m):
+    """
+    helper method used if given a public key in the apply_key(key, m)
+    :param key: the public key tuple - (e, n)
+    :param m: the inputted message that is desired to be encrypted
+    :return: the encrypted message
+    """
+    e = key[0]
+    n = key[1]
+    print("public returned key = ", (m ^ e) % n)
+    return (m ^ e) % n
+
+
+def private_key_decrypt(key, m):
+    """
+    helper method to be used when given a private key in apply_key(key, m)
+    :param key: the private key tuple - (d,n)
+    :param m: the given encrypted message
+    :return: the deciphered message
+    """
+    c = m
+    d = key[0]
+    n = key[1]
+    print("private returned key = ", (c ^ d) % n)
+    return (c ^ d) % n
 
 
 def break_key(pub):
@@ -375,7 +428,7 @@ def break_key(pub):
     e = pub[0]
     factors_list = []
     # Get all factors of n
-    factors_list =get_factors(pub[1])
+    factors_list = get_factors(pub[1])
 
     # Get all prime factors of n
     primes = []
@@ -393,7 +446,7 @@ def break_key(pub):
 
 def get_factors(number):
     factor_list = []
-    for x in range(1, number+1):
+    for x in range(1, number + 1):
         if number % x == 0:
             factor_list.append(x)
 
