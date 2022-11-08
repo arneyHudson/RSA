@@ -29,14 +29,17 @@ Trudy follows other steps to break a key.
 What is the difference between Bob’s steps and Trudy’s so that Bob is able to run his steps on large numbers,
 but Trudy cannot run her steps on large numbers?
 
-
+Bob gets the p and q values by randomly choosing and checking if they are prime.
+Trudy has to go through every possible factor of e and then check if every one of those factors is prime.
 
 
 Checksum Activity:
 Provide a discussion of your experiences as described in the activity.  Be sure to answer all questions.
 
-
-
+Using the same numbers but rearranged resulted in the same hashcode, which is how we are able to send Alice a
+larger amount than what was actually due.
+The way to have trudy not be able to do this trick would be to encrypt the message with bobs private key assuming
+Alice has bob's public key, then only bob could have send the message since only he has his private key.
 
 
 Summary: (Summarize your experience with the lab, what you learned, what you liked, what you disliked,
