@@ -9,8 +9,9 @@
 
 16-bit RSA
 
-Introduction: (Describe the lab in your own words): In this lab we seek to create both public and private key values,
-encrypt and decrypt message using these key values, and to get the private key from a given public key.
+Introduction: (Describe the lab in your own words):
+In this lab we seek to create both public and private key values,encrypt and decrypt message using these key values,
+and to get the private key from a given public key.
 
 
 
@@ -18,13 +19,15 @@ encrypt and decrypt message using these key values, and to get the private key f
 
 Question 1: RSA Security
 In this lab, Trudy is able to find the private key from the public key. Why is this not a problem for RSA in practice?
-
-
-
-
+Because if given the public key, the values "e" and "n" are already known. With these values d can be calculated by
+getting the factors that make up "e" which can be thought of as "p" and "q". With "p" and "q", "z" can be found
+which can finally be used to calculate "d". With "d" getting the private key is easy.
 
 Question 2: Critical Step(s)
-When creating a key, Bob follows certain steps. Trudy follows other steps to break a key. What is the difference between Bob’s steps and Trudy’s so that Bob is able to run his steps on large numbers, but Trudy cannot run her steps on large numbers?
+When creating a key, Bob follows certain steps.
+Trudy follows other steps to break a key.
+What is the difference between Bob’s steps and Trudy’s so that Bob is able to run his steps on large numbers,
+but Trudy cannot run her steps on large numbers?
 
 
 
@@ -36,7 +39,16 @@ Provide a discussion of your experiences as described in the activity.  Be sure 
 
 
 
-Summary: (Summarize your experience with the lab, what you learned, what you liked,what you disliked, and any suggestions you have for improvement)
+Summary: (Summarize your experience with the lab, what you learned, what you liked, what you disliked,
+ and any suggestions you have for improvement):
+We learned how to create a key with the given values learned through lectures. Getting these values wasn't difficult at
+first but the problems easily started to pile. The majority of the problems came from the apply_key(key, m) method which
+I didn't realize at first is the same for both private and public keys. I was trying to distinguish the two and then do
+separate operations with the given information, which wasn't working. I disliked the debugging process because of this
+because there was a lot of wasted time even though the code was almost always working. We suggest that the lab have
+slightly more instructions of what to do with certain variables because there was a lot of logic that needed to be done
+to understand what was happening. We were able to eventually figure out how everything went together so this was a minor
+problem that just took some extra time to look at.
 
 
 
@@ -45,8 +57,6 @@ Summary: (Summarize your experience with the lab, what you learned, what you lik
 """
 
 import random
-import math
-import sys
 
 # Use these named constants as you write your code
 # To increase the key size add more 1's and 0's to these values
@@ -55,9 +65,11 @@ import sys
 
 MAX_PRIME = 0b11111111  # The maximum value a prime number can have
 MIN_PRIME = 0b11000001  # The minimum value a prime number can have 
-PUBLIC_EXPONENT = 17  # The default public exponent
+PUBLIC_EXPONENT = 38461  # The default public exponent
 
 
+# mod = 51067
+# private = 35629
 # ---------------------------------------
 # Do not modify code below this line
 # ---------------------------------------
@@ -94,7 +106,6 @@ def main():
 def create_keys_interactive():
     """
     Create new public keys
-
     :return: the private key (d, n) for use by other interactive methods
     """
 
@@ -316,30 +327,24 @@ def create_keys():
     :return: the keys as a three-tuple: (e,d,n)
     """
 
-    e = 65537
-
-    p = random.randint(1, e)
-    q = random.randint(1, e)
+    p = random.randint(int(MIN_PRIME), int(MAX_PRIME))
+    q = random.randint(int(MIN_PRIME), int(MAX_PRIME))
+    while not get_prime(p):
+        p = random.randint(int(MIN_PRIME), int(MAX_PRIME))
+    while not get_prime(q):
+        q = random.randint(int(MIN_PRIME), int(MAX_PRIME))
 
     if p != q:
-        while not get_prime(p):
-            p = random.randint(1, e)
-        while not get_prime(q):
-            q = random.randint(1, e)
-
         n = p * q
-
         z = (p - 1) * (q - 1)
-
+        e = random.randint(1, z)
+        while not (get_prime(e) & (z % e != 0)):
+            e = random.randint(1, z)
         d = generate_d(e, z)
-        print("d = ", d)
 
+        return e, d, n
     else:
-        while p == q:
-            p = random.randint(1, e)
-            q = random.randint(1, e)
-
-    return e, d, n
+        create_keys()
 
 
 def generate_d(e, z):
@@ -395,8 +400,7 @@ def public_key_encrypt(key, m):
     """
     e = key[0]
     n = key[1]
-    print("public returned key = ", (m ^ e) % n)
-    return (m ^ e) % n
+    return (m ** e) % n
 
 
 def private_key_decrypt(key, m):
@@ -409,8 +413,8 @@ def private_key_decrypt(key, m):
     c = m
     d = key[0]
     n = key[1]
-    print("private returned key = ", (c ^ d) % n)
-    return (c ^ d) % n
+
+    return (c ** d) % n
 
 
 def break_key(pub):
