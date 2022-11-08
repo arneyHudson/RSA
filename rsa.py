@@ -21,7 +21,8 @@ Question 1: RSA Security
 In this lab, Trudy is able to find the private key from the public key. Why is this not a problem for RSA in practice?
 Because if given the public key, the values "e" and "n" are already known. With these values d can be calculated by
 getting the factors that make up "e" which can be thought of as "p" and "q". With "p" and "q", "z" can be found
-which can finally be used to calculate "d". With "d" getting the private key is easy.
+which can finally be used to calculate "d". With "d" getting the private key is easy. In real life RSA however this
+takes a larger amount of time than the message is worth trying to decrypt, so it isn't something to worry about.
 
 Question 2: Critical Step(s)
 When creating a key, Bob follows certain steps.
@@ -68,7 +69,7 @@ import random
 
 MAX_PRIME = 0b11111111  # The maximum value a prime number can have
 MIN_PRIME = 0b11000001  # The minimum value a prime number can have 
-PUBLIC_EXPONENT = 38461  # The default public exponent
+PUBLIC_EXPONENT = 17  # The default public exponent
 
 
 # mod = 51067
@@ -324,6 +325,8 @@ def format_as_hex(value):
 #   apply, and break the RSA keys
 # ---------------------------------------
 
+#44197
+#41201
 def create_keys():
     """
     Create the public and private keys.
@@ -340,9 +343,10 @@ def create_keys():
     if p != q:
         n = p * q
         z = (p - 1) * (q - 1)
-        e = random.randint(1, z)
-        while not (get_prime(e) & (z % e != 0)):
-            e = random.randint(1, z)
+        e = PUBLIC_EXPONENT
+        #e = random.randint(1, z)
+        #while not (get_prime(e) & (z % e != 0)):
+        #    e = random.randint(1, z)
         d = generate_d(e, z)
 
         return e, d, n
